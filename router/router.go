@@ -11,7 +11,7 @@ func SetupRouter() *gin.Engine {
 
 	authController := controller.NewAuthController()
 
-	// Auth routes
+	
 	r.POST("/login", authController.Login)
 
 	return r

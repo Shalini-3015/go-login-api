@@ -17,31 +17,37 @@ type AuthService struct {
 	userRepo *repository.UserRepository
 }
 
-// Constructor
 func NewAuthService() *AuthService {
 	return &AuthService{
 		userRepo: repository.NewUserRepository(),
 	}
 }
 
-// Login logic
+func HashPassword(password string) (string, error) {
+	hashedBytes, err := bcrypt.GenerateFromPassword(
+		[]byte(password),
+		bcrypt.DefaultCost,
+	)
+	if err != nil {
+		return "", err
+	}
+	return string(hashedBytes), nil
+}
+
 func (s *AuthService) Login(email, password string) (string, error) {
-	// Get user from DB
+	
 	user, err := s.userRepo.GetByEmail(email)
 	if err != nil {
 		return "", errors.New("invalid email or password")
 	}
 
-	// Compare password
-	err = bcrypt.CompareHashAndPassword(
+	if err = bcrypt.CompareHashAndPassword(
 		[]byte(user.Password),
 		[]byte(password),
-	)
-	if err != nil {
+	); err != nil {
 		return "", errors.New("invalid email or password")
 	}
 
-	// Generate JWT
 	token, err := generateJWT(user)
 	if err != nil {
 		return "", err
@@ -50,7 +56,6 @@ func (s *AuthService) Login(email, password string) (string, error) {
 	return token, nil
 }
 
-// JWT creation
 func generateJWT(user *models.User) (string, error) {
 	claims := jwt.MapClaims{
 		"user_id": user.ID,
