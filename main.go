@@ -10,7 +10,14 @@ import (
 
 func main() {
 	config.ConnectDatabase()
-	config.DB.AutoMigrate(&models.User{})
+	migrateModels()
 	r := router.SetupRouter()
 	r.Run(":8080")
+}
+
+func migrateModels() {
+	config.DB.AutoMigrate(
+		&models.LoginUser{},
+		
+	)
 }
