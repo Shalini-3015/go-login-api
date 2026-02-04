@@ -42,3 +42,27 @@ func (a *AuthController) Login(c *gin.Context) {
 		AccessToken: token,
 	})
 }
+
+
+func (a *AuthController) RegisterUser(c *gin.Context) {
+	var req auth.RegisterUserRequest
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "invalid request body",
+		})
+		return
+	}
+
+	err := a.authService.RegisterUser(req.Email, req.Password)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusCreated, auth.RegisterUserResponse{
+		Message: "user registered successfully",
+	})
+}
