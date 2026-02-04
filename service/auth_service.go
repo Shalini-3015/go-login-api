@@ -34,7 +34,7 @@ func HashPassword(password string) (string, error) {
 	return string(hashedBytes), nil
 }
 
-func (s *AuthService) Login(email, password string) (string, error) {
+func (s *AuthService) UserLogin(email, password string) (string, error) {
 	
 	user, err := s.userRepo.GetByEmail(email)
 	if err != nil {
@@ -56,7 +56,7 @@ func (s *AuthService) Login(email, password string) (string, error) {
 	return token, nil
 }
 
-func generateJWT(user *models.User) (string, error) {
+func generateJWT(user *models.LoginUser) (string, error) {
 	claims := jwt.MapClaims{
 		"user_id": user.ID,
 		"email":   user.Email,
