@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"go-login-api-task/service"
-
+    "go-login-api-task/dto/auth"
 	"github.com/gin-gonic/gin"
 )
 
@@ -21,20 +21,16 @@ func NewAuthController() *AuthController {
 
 
 func (a *AuthController) Login(c *gin.Context) {
-	var LoginRequest struct {
-		Email    string `json:"email"`
-		Password string `json:"password"`
-	}
+	var req auth.LoginRequest
 
-
-	if err := c.ShouldBindJSON(&LoginRequest); err != nil {
+	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "invalid request body",
 		})
 		return
 	}
 
-	token, err := a.authService.UserLogin(LoginRequest.Email, LoginRequest.Password)
+	token, err := a.authService.UserLogin(req.Email, req.Password)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"error": err.Error(),
@@ -42,8 +38,7 @@ func (a *AuthController) Login(c *gin.Context) {
 		return
 	}
 
-	
-	c.JSON(http.StatusOK, gin.H{
-		"token": token,
+	c.JSON(http.StatusOK, auth.LoginResponse{
+		AccessToken: token,
 	})
 }
