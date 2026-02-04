@@ -21,20 +21,20 @@ func NewAuthController() *AuthController {
 
 
 func (a *AuthController) Login(c *gin.Context) {
-	var req struct {
+	var LoginRequest struct {
 		Email    string `json:"email"`
 		Password string `json:"password"`
 	}
 
 
-	if err := c.ShouldBindJSON(&req); err != nil {
+	if err := c.ShouldBindJSON(&LoginRequest); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "invalid request body",
 		})
 		return
 	}
 
-	token, err := a.authService.Login(req.Email, req.Password)
+	token, err := a.authService.UserLogin(LoginRequest.Email, LoginRequest.Password)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"error": err.Error(),
