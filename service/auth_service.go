@@ -38,14 +38,14 @@ func (s *AuthService) UserLogin(email, password string) (string, error) {
 	
 	user, err := s.userRepo.GetByEmail(email)
 	if err != nil {
-		return "", errors.New("invalid email or password")
+		return "", errors.New("invalid email")
 	}
 
 	if err = bcrypt.CompareHashAndPassword(
 		[]byte(user.Password),
 		[]byte(password),
 	); err != nil {
-		return "", errors.New("invalid email or password")
+		return "", errors.New("invalid password")
 	}
 
 	token, err := generateJWT(user)
