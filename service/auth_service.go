@@ -56,6 +56,24 @@ func (s *AuthService) UserLogin(email, password string) (string, error) {
 	return token, nil
 }
 
+
+func (s *AuthService) RegisterUser(email, password string) error {
+	hashedPassword, err := HashPassword(password)
+	if err != nil {
+		return errors.New("failed to hash password")
+	}
+
+	user := &models.LoginUser{
+		Email:    email,
+		Password: hashedPassword,
+	}
+
+	return s.userRepo.Create(user)
+}
+
+
+
+
 func generateJWT(user *models.LoginUser) (string, error) {
 	claims := jwt.MapClaims{
 		"user_id": user.ID,
