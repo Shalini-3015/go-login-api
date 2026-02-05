@@ -36,7 +36,7 @@ func HashPassword(password string) (string, error) {
 
 func (s *AuthService) UserLogin(email, password string) (string, error) {
 	
-	user, err := s.userRepo.GetByEmail(email)
+	user, err := s.userRepo.GetUserByEmail(email)
 	if err != nil {
 		return "", errors.New("invalid email")
 	}
@@ -68,7 +68,7 @@ func (s *AuthService) RegisterUser(email, password string) error {
 		Password: hashedPassword,
 	}
 
-	return s.userRepo.Create(user)
+	return s.userRepo.CreateUser(user)
 }
 
 

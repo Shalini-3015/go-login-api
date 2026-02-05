@@ -13,7 +13,7 @@ func NewUserRepository() *UserRepository {
 		DB: config.DB,
 	}
 }
-func (r *UserRepository) GetByEmail(email string) (*models.LoginUser, error) {
+func (r *UserRepository) GetUserByEmail(email string) (*models.LoginUser, error) {
 	var user models.LoginUser
 
 	err := r.DB.Where("email = ?", email).First(&user).Error
@@ -23,6 +23,6 @@ func (r *UserRepository) GetByEmail(email string) (*models.LoginUser, error) {
 
 	return &user, nil
 }
-func (r *UserRepository) Create(user *models.LoginUser) error {
+func (r *UserRepository) CreateUser(user *models.LoginUser) error {
 	return r.DB.Create(user).Error
 }

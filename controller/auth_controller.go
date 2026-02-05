@@ -20,7 +20,7 @@ func NewAuthController() *AuthController {
 }
 
 
-func (a *AuthController) Login(c *gin.Context) {
+func (a *AuthController) UserLogin(c *gin.Context) {
 	var req auth.LoginRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
