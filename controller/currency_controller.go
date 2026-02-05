@@ -69,18 +69,18 @@ func (c *CurrencyController) UpdateCurrency(ctx *gin.Context) {
 		return
 	}
 
-	var req struct {
+	var updateCurrReq struct {
 		Name     string `json:"name"`
 		Symbol   string `json:"symbol"`
 		IsActive bool   `json:"is_active"`
 	}
 
-	if err := ctx.ShouldBindJSON(&req); err != nil {
+	if err := ctx.ShouldBindJSON(&updateCurrReq); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	if err := c.service.UpdateCurrency(uint(id), req.Name, req.Symbol, req.IsActive); err != nil {
+	if err := c.service.UpdateCurrency(uint(id), updateCurrReq.Name, updateCurrReq.Symbol, updateCurrReq.IsActive); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
