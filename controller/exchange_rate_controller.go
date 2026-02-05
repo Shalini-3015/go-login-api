@@ -69,17 +69,17 @@ func (c *ExchangeRateController) UpdateExchangeRate(ctx *gin.Context) {
 		return
 	}
 
-	var req struct {
+	var updateExcReq struct {
 		Rate float64 `json:"rate"`
 		IsActive *bool   `json:"is_active"`
 	}
 
-	if err := ctx.ShouldBindJSON(&req); err != nil {
+	if err := ctx.ShouldBindJSON(&updateExcReq); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	if err := c.service.UpdateExchangeRate(uint(id), req.Rate,req.IsActive); err != nil {
+	if err := c.service.UpdateExchangeRate(uint(id), updateExcReq.Rate, updateExcReq.IsActive); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
