@@ -43,7 +43,7 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		// optional: store claims in context
+		
 		if claims, ok := token.Claims.(jwt.MapClaims); ok {
 			ctx.Set("user_id", claims["user_id"])
 		}
