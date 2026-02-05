@@ -41,15 +41,15 @@ func (s *ExchangeRateService) CreateExchangeRate(rate *models.ExchangeRate) erro
 		return errors.New("to currency not found or inactive")
 	}
 
-	return s.repo.Create(rate)
+	return s.repo.CreateExcRate(rate)
 }
 
 func (s *ExchangeRateService) GetActiveExchangeRates() ([]models.ExchangeRate, error) {
-	return s.repo.GetAllActive()
+	return s.repo.GetAllActiveExcRate()
 }
 
 func (s *ExchangeRateService) GetExchangeRateByID(id uint) (*models.ExchangeRate, error) {
-	rate, err := s.repo.GetByID(id)
+	rate, err := s.repo.GetExcRateByID(id)
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +68,7 @@ func (s *ExchangeRateService) UpdateExchangeRate(
 		return errors.New("exchange rate must be greater than zero")
 	}
 
-	rate, err := s.repo.GetByID(id)
+	rate, err := s.repo.GetExcRateByID(id)
 	if err != nil {
 		return err
 	}
@@ -82,11 +82,11 @@ func (s *ExchangeRateService) UpdateExchangeRate(
 		rate.IsActive = *isActive
 	}
 
-	return s.repo.Update(rate)
+	return s.repo.UpdateExcRate(rate)
 }
 
 func (s *ExchangeRateService) DeactivateExchangeRate(id uint) error {
-	rate, err := s.repo.GetByID(id)
+	rate, err := s.repo.GetExcRateByID(id)
 	if err != nil {
 		return err
 	}
@@ -94,5 +94,5 @@ func (s *ExchangeRateService) DeactivateExchangeRate(id uint) error {
 		return errors.New("exchange rate not found")
 	}
 
-	return s.repo.Deactivate(id)
+	return s.repo.DeactivateExcRate(id)
 }
