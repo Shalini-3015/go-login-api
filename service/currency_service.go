@@ -49,7 +49,7 @@ func (s *CurrencyService) GetCurrencyByID(id uint) (*models.Currency, error) {
 	return currency, nil
 }
 
-func (s *CurrencyService) UpdateCurrency(id uint, name, symbol string, isActive bool) error {
+func (s *CurrencyService) UpdateCurrency(id uint, name, symbol *string, isActive *bool) error {
 	currency, err := s.repo.GetCurrencyByID(id)
 	if err != nil {
 		return err
@@ -58,9 +58,18 @@ func (s *CurrencyService) UpdateCurrency(id uint, name, symbol string, isActive 
 		return errors.New("currency not found")
 	}
 
-	currency.Name = name
-	currency.Symbol = symbol
-	currency.IsActive = isActive
+	if name != nil {
+	currency.Name = *name
+}
+
+if symbol != nil {
+	currency.Symbol = *symbol
+}
+
+if isActive != nil {
+	currency.IsActive = *isActive
+}
+
 
 	return s.repo.UpdateCurrency(currency)
 }

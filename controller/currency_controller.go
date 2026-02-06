@@ -70,8 +70,8 @@ func (c *CurrencyController) UpdateCurrency(ctx *gin.Context) {
 	}
 
 	var updateCurrReq struct {
-		Name     string `json:"name"`
-		Symbol   string `json:"symbol"`
+		Name     *string `json:"name"`
+		Symbol   *string `json:"symbol"`
 		IsActive bool   `json:"is_active"`
 	}
 
@@ -80,7 +80,7 @@ func (c *CurrencyController) UpdateCurrency(ctx *gin.Context) {
 		return
 	}
 
-	if err := c.service.UpdateCurrency(uint(id), updateCurrReq.Name, updateCurrReq.Symbol, updateCurrReq.IsActive); err != nil {
+	if err := c.service.UpdateCurrency(uint(id), updateCurrReq.Name, updateCurrReq.Symbol, &updateCurrReq.IsActive); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
