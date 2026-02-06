@@ -39,13 +39,20 @@ func (s *ConversionService) ConvertCurrencyAmt(from, to string, amount float64) 
 	to = strings.ToUpper(to)
 
 	fromCurrency, err := s.currencyRepo.GetCurrencyByCode(from)
-	if err != nil || fromCurrency == nil || !fromCurrency.IsActive {
-		return nil, errors.New("from currency not found or inactive")
+	if err != nil || fromCurrency == nil  {
+		return nil, errors.New("from currency not found")
+	}
+	if !fromCurrency.IsActive {
+		return nil, errors.New("from currency is inactive")
 	}
 
+
 	toCurrency, err := s.currencyRepo.GetCurrencyByCode(to)
-	if err != nil || toCurrency == nil || !toCurrency.IsActive {
-		return nil, errors.New("to currency not found or inactive")
+	if err != nil || toCurrency == nil  {
+		return nil, errors.New("to currency not found ")
+	}
+	if !toCurrency.IsActive {
+		return nil, errors.New("to currency is inactive")
 	}
 
 	rate, err := s.rateRepo.GetActiveRate(fromCurrency.ID, toCurrency.ID)
