@@ -34,6 +34,7 @@ func (s *ConversionService) ConvertCurrencyAmt(from, to string, amount float64) 
 	if amount <= 0 {
 		return nil, errors.New("amount must be greater than zero")
 	}
+	
 
 	from = strings.ToUpper(from)
 	to = strings.ToUpper(to)
