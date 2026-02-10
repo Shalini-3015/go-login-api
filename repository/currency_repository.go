@@ -51,8 +51,3 @@ func (r *CurrencyRepository) UpdateCurrency(currency *models.Currency) error {
 	return r.db.Save(currency).Error
 }
 
-func (r *CurrencyRepository) DeactivateCurrency(id uint) error {
-	return r.db.Model(&models.Currency{}).
-		Where("id = ?", id).
-		Update("is_active", false).Error
-}

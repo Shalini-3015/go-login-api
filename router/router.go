@@ -11,26 +11,21 @@ import (
 
 func SetupRouter(r *gin.Engine) {
 
-	
 	currencyRepo := repository.NewCurrencyRepository()
 	exchangeRateRepo := repository.NewExchangeRateRepository()
 
-	
 	currencyService := service.NewCurrencyService(currencyRepo)
 	exchangeRateService := service.NewExchangeRateService(exchangeRateRepo, currencyRepo)
 	conversionService := service.NewConversionService(currencyRepo, exchangeRateRepo)
 
-	
 	authController := controller.NewAuthController()
 	currencyController := controller.NewCurrencyController(currencyService)
 	exchangeRateController := controller.NewExchangeRateController(exchangeRateService)
 	conversionController := controller.NewConversionController(conversionService)
 
-	
 	r.POST("/login", authController.UserLogin)
 	r.POST("/register", authController.RegisterUser)
 
-	
 	protected := r.Group("/")
 	protected.Use(middleware.AuthMiddleware())
 

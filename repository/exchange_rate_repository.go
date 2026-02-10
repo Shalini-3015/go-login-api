@@ -54,8 +54,3 @@ func (r *ExchangeRateRepository) UpdateExcRate(rate *models.ExchangeRate) error 
 	return r.db.Save(rate).Error
 }
 
-func (r *ExchangeRateRepository) DeactivateExcRate(id uint) error {
-	return r.db.Model(&models.ExchangeRate{}).
-		Where("id = ?", id).
-		Update("is_active", false).Error
-}

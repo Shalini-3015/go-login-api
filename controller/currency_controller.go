@@ -1,11 +1,11 @@
 package controller
 
 import (
-	"net/http"
-	"strconv"
-
 	"go-login-api-task/models"
 	"go-login-api-task/service"
+	"log"
+	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -72,7 +72,7 @@ func (c *CurrencyController) UpdateCurrency(ctx *gin.Context) {
 	var updateCurrReq struct {
 		Name     *string `json:"name"`
 		Symbol   *string `json:"symbol"`
-		IsActive bool   `json:"is_active"`
+		IsActive bool    `json:"is_active"`
 	}
 
 	if err := ctx.ShouldBindJSON(&updateCurrReq); err != nil {
@@ -97,6 +97,7 @@ func (c *CurrencyController) DeleteCurrency(ctx *gin.Context) {
 	}
 
 	if err := c.service.DeactivateCurrency(uint(id)); err != nil {
+		log.Println(">>> DELETE /currencies hit")
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}

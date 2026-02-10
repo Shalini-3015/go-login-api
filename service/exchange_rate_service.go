@@ -2,7 +2,7 @@ package service
 
 import (
 	"errors"
-
+	"time"
 	"go-login-api-task/models"
 	"go-login-api-task/repository"
 )
@@ -60,10 +60,10 @@ func (s *ExchangeRateService) GetExchangeRateByID(id uint) (*models.ExchangeRate
 }
 
 func (s *ExchangeRateService) UpdateExchangeRate(
-	id uint, 
+	id uint,
 	value float64,
 	isActive *bool,
-	) error {
+) error {
 	if value <= 0 {
 		return errors.New("exchange rate must be greater than zero")
 	}
@@ -93,6 +93,12 @@ func (s *ExchangeRateService) DeactivateExchangeRate(id uint) error {
 	if rate == nil {
 		return errors.New("exchange rate not found")
 	}
+	if !rate.IsActive {
+		return errors.New("exchange rate already inactive")
+	}
 
-	return s.repo.DeactivateExcRate(id)
+now := time.Now()
+	rate.IsActive = false
+	rate.DeletedAt = &now
+	return s.repo.UpdateExcRate(rate)
 }

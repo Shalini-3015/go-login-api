@@ -1,14 +1,14 @@
 package middleware
 
 import (
-	"net/http"
-	"strings"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
+	"net/http"
+	"strings"
 )
 
-var jwtSecret = []byte("secret_key") 
+var jwtSecret = []byte("secret_key")
 
 func AuthMiddleware() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
@@ -29,9 +29,6 @@ func AuthMiddleware() gin.HandlerFunc {
 
 		tokenStr := parts[1]
 		fmt.Println("TOKEN:", tokenStr)
-		
-
-
 
 		token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
 			return jwtSecret, nil
@@ -43,7 +40,6 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		
 		if claims, ok := token.Claims.(jwt.MapClaims); ok {
 			ctx.Set("user_id", claims["user_id"])
 		}

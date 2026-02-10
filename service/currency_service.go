@@ -2,10 +2,11 @@ package service
 
 import (
 	"errors"
-	"strings"
-
 	"go-login-api-task/models"
 	"go-login-api-task/repository"
+	"log"
+	"strings"
+	"time"
 )
 
 type CurrencyService struct {
@@ -49,7 +50,11 @@ func (s *CurrencyService) GetCurrencyByID(id uint) (*models.Currency, error) {
 	return currency, nil
 }
 
-func (s *CurrencyService) UpdateCurrency(id uint, name, symbol *string, isActive *bool) error {
+func (s *CurrencyService) UpdateCurrency(
+	id uint,
+	name, symbol *string,
+	isActive *bool,
+) error {
 	currency, err := s.repo.GetCurrencyByID(id)
 	if err != nil {
 		return err
@@ -59,17 +64,22 @@ func (s *CurrencyService) UpdateCurrency(id uint, name, symbol *string, isActive
 	}
 
 	if name != nil {
-	currency.Name = *name
-}
+		currency.Name = *name
+	}
 
-if symbol != nil {
-	currency.Symbol = *symbol
-}
+	if symbol != nil {
+		currency.Symbol = *symbol
+	}
 
-if isActive != nil {
-	currency.IsActive = *isActive
-}
-
+	if isActive != nil {
+		if *isActive && !currency.IsActive {
+			currency.IsActive = true
+			currency.DeletedAt = nil
+		}
+		if !*isActive {
+			return errors.New("use delete api to deactivate currency")
+		}
+	}
 
 	return s.repo.UpdateCurrency(currency)
 }
@@ -82,6 +92,13 @@ func (s *CurrencyService) DeactivateCurrency(id uint) error {
 	if currency == nil {
 		return errors.New("currency not found")
 	}
+	if !currency.IsActive {
+		return errors.New("currency already inactive")
+	}
+	now := time.Now()
 
-	return s.repo.DeactivateCurrency(id)
+	currency.IsActive = false
+	currency.DeletedAt = &now
+	log.Println(">>> setting deleted_at:", currency.DeletedAt)
+	return s.repo.UpdateCurrency(currency)
 }

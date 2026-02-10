@@ -4,10 +4,12 @@ import (
 	"go-login-api-task/config"
 	"go-login-api-task/models"
 	"gorm.io/gorm"
-)	
+)
+
 type UserRepository struct {
 	DB *gorm.DB
-}	
+}
+
 func NewUserRepository() *UserRepository {
 	return &UserRepository{
 		DB: config.DB,

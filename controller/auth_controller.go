@@ -3,22 +3,20 @@ package controller
 import (
 	"net/http"
 
-	"go-login-api-task/service"
-    "go-login-api-task/dto/auth"
 	"github.com/gin-gonic/gin"
+	"go-login-api-task/dto/auth"
+	"go-login-api-task/service"
 )
 
 type AuthController struct {
 	authService *service.AuthService
 }
 
-
 func NewAuthController() *AuthController {
 	return &AuthController{
 		authService: service.NewAuthService(),
 	}
 }
-
 
 func (a *AuthController) UserLogin(c *gin.Context) {
 	var req auth.LoginRequest
@@ -42,7 +40,6 @@ func (a *AuthController) UserLogin(c *gin.Context) {
 		AccessToken: token,
 	})
 }
-
 
 func (a *AuthController) RegisterUser(c *gin.Context) {
 	var req auth.RegisterUserRequest

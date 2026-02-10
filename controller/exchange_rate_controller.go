@@ -70,7 +70,7 @@ func (c *ExchangeRateController) UpdateExchangeRate(ctx *gin.Context) {
 	}
 
 	var updateExcReq struct {
-		Rate float64 `json:"rate"`
+		Rate     float64 `json:"rate"`
 		IsActive *bool   `json:"is_active"`
 	}
 

@@ -14,7 +14,7 @@ type ExchangeRate struct {
 	Rate float64 `gorm:"type:numeric(12,4);not null" json:"rate"`
 
 	IsActive bool `gorm:"default:true" json:"is_active"`
-
+	DeletedAt *time.Time `gorm:"index" json:"deleted_at,omitempty"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }

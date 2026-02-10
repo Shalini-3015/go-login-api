@@ -35,7 +35,7 @@ func HashPassword(password string) (string, error) {
 }
 
 func (s *AuthService) UserLogin(email, password string) (string, error) {
-	
+
 	user, err := s.userRepo.GetUserByEmail(email)
 	if err != nil {
 		return "", errors.New("invalid email")
@@ -56,7 +56,6 @@ func (s *AuthService) UserLogin(email, password string) (string, error) {
 	return token, nil
 }
 
-
 func (s *AuthService) RegisterUser(email, password string) error {
 	hashedPassword, err := HashPassword(password)
 	if err != nil {
@@ -70,9 +69,6 @@ func (s *AuthService) RegisterUser(email, password string) error {
 
 	return s.userRepo.CreateUser(user)
 }
-
-
-
 
 func generateJWT(user *models.LoginUser) (string, error) {
 	claims := jwt.MapClaims{

@@ -34,22 +34,20 @@ func (s *ConversionService) ConvertCurrencyAmt(from, to string, amount float64) 
 	if amount <= 0 {
 		return nil, errors.New("amount must be greater than zero")
 	}
-	
 
 	from = strings.ToUpper(from)
 	to = strings.ToUpper(to)
 
 	fromCurrency, err := s.currencyRepo.GetCurrencyByCode(from)
-	if err != nil || fromCurrency == nil  {
+	if err != nil || fromCurrency == nil {
 		return nil, errors.New("from currency not found")
 	}
 	if !fromCurrency.IsActive {
 		return nil, errors.New("from currency is inactive")
 	}
 
-
 	toCurrency, err := s.currencyRepo.GetCurrencyByCode(to)
-	if err != nil || toCurrency == nil  {
+	if err != nil || toCurrency == nil {
 		return nil, errors.New("to currency not found ")
 	}
 	if !toCurrency.IsActive {
