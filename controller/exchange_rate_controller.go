@@ -1,11 +1,12 @@
 package controller
 
 import (
+	
+	"go-login-api-task/models"
+	"go-login-api-task/service"
 	"net/http"
 	"strconv"
 	"strings"
-	"go-login-api-task/models"
-	"go-login-api-task/service"
 
 	"github.com/gin-gonic/gin"
 )
@@ -125,6 +126,7 @@ func (c *ExchangeRateController) SyncExchangeRates(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
+		
 		"base":  strings.ToUpper(req.Base),
 		"rates": rates,
 	})
