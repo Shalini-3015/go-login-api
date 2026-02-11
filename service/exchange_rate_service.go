@@ -180,7 +180,7 @@ func (s *ExchangeRateService) FetchAndSyncRates(base string) (map[string]float64
 		}
 
 		if existingRate != nil {
-			// Update existing
+		
 			existingRate.Rate = rateValue
 			existingRate.IsActive = true
 			existingRate.DeletedAt = nil
@@ -189,7 +189,7 @@ func (s *ExchangeRateService) FetchAndSyncRates(base string) (map[string]float64
 				return nil, err
 			}
 		} else {
-			// Create new
+			
 			newRate := &models.ExchangeRate{
 				FromCurrencyID: baseCurrency.ID,
 				ToCurrencyID:   toCurrencyID,
@@ -203,6 +203,43 @@ func (s *ExchangeRateService) FetchAndSyncRates(base string) (map[string]float64
 		}
 
 		result[code] = rateValue
+		// 🔹 Generate inverse rate (target → base)
+if rateValue != 0 {
+
+    inverseRate := 1 / rateValue
+
+    inverseExisting, err := s.repo.
+        GetExchangeRateByCurrencyIDs(toCurrencyID, baseCurrency.ID)
+
+    if err != nil {
+        return nil, err
+    }
+
+    if inverseExisting != nil {
+
+        inverseExisting.Rate = inverseRate
+        inverseExisting.IsActive = true
+        inverseExisting.DeletedAt = nil
+
+        if err := s.repo.UpdateExchangeRate(inverseExisting); err != nil {
+            return nil, err
+        }
+
+    } else {
+
+        inverseNew := &models.ExchangeRate{
+            FromCurrencyID: toCurrencyID,
+            ToCurrencyID:   baseCurrency.ID,
+            Rate:           inverseRate,
+            IsActive:       true,
+        }
+
+        if err := s.repo.CreateExchangeRate(inverseNew); err != nil {
+            return nil, err
+        }
+    }
+}
+
 	}
 
 	return result, nil
