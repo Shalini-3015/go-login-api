@@ -51,3 +51,12 @@ func (r *CurrencyRepository) UpdateCurrency(currency *models.Currency) error {
 	return r.db.Save(currency).Error
 }
 
+func (r *CurrencyRepository) GetActiveCurrencies() ([]models.Currency, error) {
+	var currencies []models.Currency
+
+	err := r.db.
+		Where("is_active = ?", true).
+		Find(&currencies).Error
+
+	return currencies, err
+}

@@ -54,3 +54,29 @@ func (r *ExchangeRateRepository) UpdateExcRate(rate *models.ExchangeRate) error 
 	return r.db.Save(rate).Error
 }
 
+func (r *ExchangeRateRepository) CreateExchangeRate(rate *models.ExchangeRate) error {
+	return r.db.Create(rate).Error
+}
+func (r *ExchangeRateRepository) UpdateExchangeRate(rate *models.ExchangeRate) error {
+	return r.db.Save(rate).Error
+}
+
+
+func (r *ExchangeRateRepository) GetExchangeRateByCurrencyIDs(
+	fromID uint,
+	toID uint,
+) (*models.ExchangeRate, error) {
+
+	var rate models.ExchangeRate
+
+	err := r.db.
+		Where("from_currency_id = ? AND to_currency_id = ?", fromID, toID).
+		First(&rate).Error
+
+	if err == gorm.ErrRecordNotFound {
+		return nil, nil
+	}
+
+	return &rate, err
+}
+

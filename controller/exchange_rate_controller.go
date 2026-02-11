@@ -3,7 +3,7 @@ package controller
 import (
 	"net/http"
 	"strconv"
-
+	"strings"
 	"go-login-api-task/models"
 	"go-login-api-task/service"
 
@@ -70,7 +70,7 @@ func (c *ExchangeRateController) UpdateExchangeRate(ctx *gin.Context) {
 	}
 
 	var updateExcReq struct {
-		Rate     float64 `json:"rate"`
+		Rate     *float64 `json:"rate"`
 		IsActive *bool   `json:"is_active"`
 	}
 
@@ -101,4 +101,31 @@ func (c *ExchangeRateController) DeleteExchangeRate(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{"message": "exchange rate deactivated successfully"})
+}
+
+func (c *ExchangeRateController) SyncExchangeRates(ctx *gin.Context) {
+
+	var req struct {
+		Base string `json:"base"`
+	}
+
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": "invalid request body",
+		})
+		return
+	}
+
+	rates, err := c.service.FetchAndSyncRates(req.Base)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"base":  strings.ToUpper(req.Base),
+		"rates": rates,
+	})
 }

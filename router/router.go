@@ -40,6 +40,8 @@ func SetupRouter(r *gin.Engine) {
 	protected.GET("/exchange-rates/:id", exchangeRateController.GetExchangeRateByID)
 	protected.PUT("/exchange-rates/:id", exchangeRateController.UpdateExchangeRate)
 	protected.DELETE("/exchange-rates/:id", exchangeRateController.DeleteExchangeRate)
+	protected.POST("/exchange-rates/fetch", exchangeRateController.SyncExchangeRates)
+
 
 	protected.GET("/convert", conversionController.ConvertCurrency)
 }
