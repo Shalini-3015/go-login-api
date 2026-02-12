@@ -36,6 +36,10 @@ func HashPassword(password string) (string, error) {
 
 func (s *AuthService) UserLogin(email, password string) (string, error) {
 
+	if email == "" || password == "" {
+    return "", errors.New("email and password are required")
+}
+
 	user, err := s.userRepo.GetUserByEmail(email)
 	if err != nil {
 		return "", errors.New("invalid email")

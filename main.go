@@ -16,7 +16,7 @@ func main() {
 	r.Run(":8080")
 }
 
-func migrateModels() {
+func migrateModels() {      
 	config.DB.AutoMigrate(
 		&models.LoginUser{},
 		&models.Currency{},

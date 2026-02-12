@@ -2,8 +2,9 @@ package repository
 
 import (
 	"errors"
-
+	"context"
 	"go-login-api-task/config"
+	"go-login-api-task/dto/currency"
 	"go-login-api-task/models"
 
 	"gorm.io/gorm"
@@ -47,16 +48,23 @@ func (r *CurrencyRepository) GetCurrencyByCode(code string) (*models.Currency, e
 	return &currency, err
 }
 
-func (r *CurrencyRepository) UpdateCurrency(currency *models.Currency) error {
-	return r.db.Save(currency).Error
-}
+func (r *CurrencyRepository) UpdateCurrency(ctx context.Context,
+	id uint,
+	req dto.CurrencyUpdateRequest,
+) error {
 
-func (r *CurrencyRepository) GetActiveCurrencies() ([]models.Currency, error) {
-	var currencies []models.Currency
+	result := r.db.WithContext(ctx).
+		Model(&models.Currency{}).
+		Where("id = ?", id).
+		Updates(req)
 
-	err := r.db.
-		Where("is_active = ?", true).
-		Find(&currencies).Error
+	if result.Error != nil {
+		return result.Error
+	}
 
-	return currencies, err
+	if result.RowsAffected == 0 {
+		return errors.New("currency not found")
+	}
+
+	return nil
 }

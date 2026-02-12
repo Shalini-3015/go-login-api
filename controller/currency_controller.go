@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-
+"go-login-api-task/dto/currency"
 	"github.com/gin-gonic/gin"
 )
 
@@ -63,30 +63,32 @@ func (c *CurrencyController) GetCurrencyByID(ctx *gin.Context) {
 
 func (c *CurrencyController) UpdateCurrency(ctx *gin.Context) {
 	idParam := ctx.Param("id")
-	id, err := strconv.ParseUint(idParam, 10, 32)
+	id, err := strconv.ParseUint(idParam, 10, 64)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
 		return
 	}
 
-	var updateCurrReq struct {
-		Name     *string `json:"name"`
-		Symbol   *string `json:"symbol"`
-		IsActive bool    `json:"is_active"`
-	}
-
-	if err := ctx.ShouldBindJSON(&updateCurrReq); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	var req dto.CurrencyUpdateRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
 		return
 	}
 
-	if err := c.service.UpdateCurrency(uint(id), updateCurrReq.Name, updateCurrReq.Symbol, &updateCurrReq.IsActive); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if req.Name == nil && req.Symbol == nil && req.IsActive == nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "no fields provided"})
+		return
+	}
+
+	err = c.service.UpdateCurrency(ctx.Request.Context(), uint(id), req)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{"message": "currency updated successfully"})
 }
+
 
 func (c *CurrencyController) DeleteCurrency(ctx *gin.Context) {
 	idParam := ctx.Param("id")
@@ -96,7 +98,7 @@ func (c *CurrencyController) DeleteCurrency(ctx *gin.Context) {
 		return
 	}
 
-	if err := c.service.DeactivateCurrency(uint(id)); err != nil {
+	if err := c.service.DeactivateCurrency(ctx.Request.Context(), uint(id)); err != nil {
 		log.Println(">>> DELETE /currencies hit")
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

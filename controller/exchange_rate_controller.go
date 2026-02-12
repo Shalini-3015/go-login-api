@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
-
+	"go-login-api-task/dto/exc_rate"
 	"github.com/gin-gonic/gin"
 )
 
@@ -63,6 +63,7 @@ func (c *ExchangeRateController) GetExchangeRateByID(ctx *gin.Context) {
 }
 
 func (c *ExchangeRateController) UpdateExchangeRate(ctx *gin.Context) {
+
 	idParam := ctx.Param("id")
 	id, err := strconv.ParseUint(idParam, 10, 32)
 	if err != nil {
@@ -70,23 +71,23 @@ func (c *ExchangeRateController) UpdateExchangeRate(ctx *gin.Context) {
 		return
 	}
 
-	var updateExcReq struct {
-		Rate     *float64 `json:"rate"`
-		IsActive *bool   `json:"is_active"`
-	}
+	var dto exchange_rate.UpdateExchangeRateDTO
 
-	if err := ctx.ShouldBindJSON(&updateExcReq); err != nil {
+	if err := ctx.ShouldBindJSON(&dto); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	if err := c.service.UpdateExchangeRate(uint(id), updateExcReq.Rate, updateExcReq.IsActive); err != nil {
+	if err := c.service.UpdateExchangeRate(uint(id), dto); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"message": "exchange rate updated successfully"})
+	ctx.JSON(http.StatusOK, gin.H{
+		"message": "exchange rate updated successfully",
+	})
 }
+
 
 func (c *ExchangeRateController) DeleteExchangeRate(ctx *gin.Context) {
 	idParam := ctx.Param("id")

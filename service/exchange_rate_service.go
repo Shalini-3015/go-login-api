@@ -10,6 +10,7 @@ import (
 	"go-login-api-task/models"
 	"go-login-api-task/repository"
 	"go-login-api-task/dto/external"
+	"go-login-api-task/dto/exc_rate"
 )
 
 type ExchangeRateService struct {
@@ -66,39 +67,40 @@ func (s *ExchangeRateService) GetExchangeRateByID(id uint) (*models.ExchangeRate
 
 func (s *ExchangeRateService) UpdateExchangeRate(
 	id uint,
-	rate *float64,
-	isActive *bool,
+	dto exchange_rate.UpdateExchangeRateDTO,
 ) error {
+
 	existingRate, err := s.repo.GetExcRateByID(id)
-    if err != nil {
-        return err
-    }
-    if existingRate == nil {
-        return errors.New("exchange rate not found")
-    }
+	if err != nil {
+		return err
+	}
+	if existingRate == nil {
+		return errors.New("exchange rate not found")
+	}
 
-    // Update rate only if provided
-    if rate != nil {
-        if *rate <= 0 {
-            return errors.New("rate must be greater than zero")
-        }
-        existingRate.Rate = *rate
-    }
+	// Update rate if provided
+	if dto.Rate != nil {
+		if *dto.Rate <= 0 {
+			return errors.New("rate must be greater than zero")
+		}
+		existingRate.Rate = *dto.Rate
+	}
 
-    // Update active state only if provided
-    if isActive != nil {
-        existingRate.IsActive = *isActive
+	// Update active state if provided
+	if dto.IsActive != nil {
+		existingRate.IsActive = *dto.IsActive
 
-        if *isActive {
-            existingRate.DeletedAt = nil
-        } else {
-            now := time.Now()
-            existingRate.DeletedAt = &now
-        }
-    }
+		if *dto.IsActive {
+			existingRate.DeletedAt = nil
+		} else {
+			now := time.Now()
+			existingRate.DeletedAt = &now
+		}
+	}
 
-    return s.repo.UpdateExchangeRate(existingRate)
+	return s.repo.UpdateExcRate(existingRate)
 }
+
 
 
 func (s *ExchangeRateService) DeactivateExchangeRate(id uint) error {
@@ -153,7 +155,7 @@ func (s *ExchangeRateService) FetchAndSyncRates(base string) (map[string]float64
 	}
 
 	
-	activeCurrencies, err := s.currencyRepo.GetActiveCurrencies()
+	activeCurrencies, err := s.currencyRepo.GetActiveCurrency()
 	if err != nil {
 		return nil, err
 	}
@@ -171,6 +173,9 @@ func (s *ExchangeRateService) FetchAndSyncRates(base string) (map[string]float64
 		if !exists {
 			continue
 		}
+		if strings.ToUpper(code) == base {
+        continue
+    }
 
 		existingRate, err := s.repo.
 			GetExchangeRateByCurrencyIDs(baseCurrency.ID, toCurrencyID)
@@ -185,7 +190,7 @@ func (s *ExchangeRateService) FetchAndSyncRates(base string) (map[string]float64
 			existingRate.IsActive = true
 			existingRate.DeletedAt = nil
 
-			if err := s.repo.UpdateExchangeRate(existingRate); err != nil {
+			if err := s.repo.UpdateExcRate(existingRate); err != nil {
 				return nil, err
 			}
 		} else {
@@ -197,17 +202,18 @@ func (s *ExchangeRateService) FetchAndSyncRates(base string) (map[string]float64
 				IsActive:       true,
 			}
 
-			if err := s.repo.CreateExchangeRate(newRate); err != nil {
+			if err := s.repo.CreateExcRate(newRate); err != nil {
 				return nil, err
 			}
 		}
 
-		result[code] = rateValue
-		// 🔹 Generate inverse rate (target → base)
-if rateValue != 0 {
+	//	result[code] = rateValue
+		result[fmt.Sprintf("%s_%s", base, code)] = rateValue
+		// Generate inverse rate (target → base)
+if rateValue > 0 {
 
     inverseRate := 1 / rateValue
-
+	 result[fmt.Sprintf("%s_%s", code, base)] = inverseRate
     inverseExisting, err := s.repo.
         GetExchangeRateByCurrencyIDs(toCurrencyID, baseCurrency.ID)
 
@@ -221,7 +227,7 @@ if rateValue != 0 {
         inverseExisting.IsActive = true
         inverseExisting.DeletedAt = nil
 
-        if err := s.repo.UpdateExchangeRate(inverseExisting); err != nil {
+        if err := s.repo.UpdateExcRate(inverseExisting); err != nil {
             return nil, err
         }
 
@@ -234,7 +240,7 @@ if rateValue != 0 {
             IsActive:       true,
         }
 
-        if err := s.repo.CreateExchangeRate(inverseNew); err != nil {
+        if err := s.repo.CreateExcRate(inverseNew); err != nil {
             return nil, err
         }
     }
