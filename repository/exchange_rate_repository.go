@@ -21,6 +21,7 @@ func NewExchangeRateRepository() *ExchangeRateRepository {
 
 func (r *ExchangeRateRepository) CreateExcRate(rate *models.ExchangeRate) error {
 	return r.db.Create(rate).Error
+	
 }
 
 func (r *ExchangeRateRepository) GetAllActiveExcRate() ([]models.ExchangeRate, error) {

@@ -27,13 +27,26 @@ func (c *ExchangeRateController) CreateExchangeRate(ctx *gin.Context) {
 		return
 	}
 
-	if err := c.service.CreateExchangeRate(&rate); err != nil {
+	result,status, err := c.service.CreateExchangeRate(&rate)
+	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, rate)
+	if status == "updated" {
+		ctx.JSON(http.StatusOK, gin.H{
+			"message": "exchange rate already existed, updated successfully",
+			"data":    result,
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusCreated, gin.H{
+		"message": "exchange rate created successfully",
+		"data":    result,
+	})
 }
+
 
 func (c *ExchangeRateController) GetAllExchangeRate(ctx *gin.Context) {
 	rates, err := c.service.GetActiveExchangeRates()

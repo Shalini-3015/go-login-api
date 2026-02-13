@@ -46,7 +46,7 @@ func (s *CurrencyService) GetCurrencyByID(id uint) (*models.Currency, error) {
 	if err != nil {
 		return nil, err
 	}
-	if currency == nil || !currency.IsActive {
+	if currency == nil  {
 		return nil, errors.New("currency not found")
 	}
 	return currency, nil

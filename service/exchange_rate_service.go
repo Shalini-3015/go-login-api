@@ -28,27 +28,53 @@ func NewExchangeRateService(
 	}
 }
 
-func (s *ExchangeRateService) CreateExchangeRate(rate *models.ExchangeRate) error {
+func (s *ExchangeRateService) CreateExchangeRate(rate *models.ExchangeRate) (*models.ExchangeRate, string, error) {
+
 	if rate.FromCurrencyID == rate.ToCurrencyID {
-		return errors.New("from and to currency must be different")
+		return nil,"", errors.New("from and to currency must be different")
 	}
 
 	if rate.Rate <= 0 {
-		return errors.New("exchange rate must be greater than zero")
+		return nil,"", errors.New("exchange rate must be greater than zero")
+	}
+
+	existing, err := s.repo.
+		GetExchangeRateByCurrencyIDs(rate.FromCurrencyID, rate.ToCurrencyID)
+
+	if err != nil {
+		return nil,"", err
+	}
+
+	if existing != nil {
+
+		existing.Rate = rate.Rate
+		existing.IsActive = true
+		existing.DeletedAt = nil
+
+		if err := s.repo.UpdateExcRate(existing); err != nil {
+			return nil,"", err
+		}
+
+		return existing, "updated", nil
 	}
 
 	fromCurrency, err := s.currencyRepo.GetCurrencyByID(rate.FromCurrencyID)
 	if err != nil || fromCurrency == nil || !fromCurrency.IsActive {
-		return errors.New("from currency not found or inactive")
+		return nil,"", errors.New("from currency not found or inactive")
 	}
 
 	toCurrency, err := s.currencyRepo.GetCurrencyByID(rate.ToCurrencyID)
 	if err != nil || toCurrency == nil || !toCurrency.IsActive {
-		return errors.New("to currency not found or inactive")
+		return nil,"", errors.New("to currency not found or inactive")
 	}
 
-	return s.repo.CreateExcRate(rate)
+	if err := s.repo.CreateExcRate(rate); err != nil {
+		return nil,"", err
+	}
+
+	return rate, "created", nil
 }
+
 
 func (s *ExchangeRateService) GetActiveExchangeRates() ([]models.ExchangeRate, error) {
 	return s.repo.GetAllActiveExcRate()
@@ -59,7 +85,7 @@ func (s *ExchangeRateService) GetExchangeRateByID(id uint) (*models.ExchangeRate
 	if err != nil {
 		return nil, err
 	}
-	if rate == nil || !rate.IsActive {
+	if rate == nil  {
 		return nil, errors.New("exchange rate not found")
 	}
 	return rate, nil
